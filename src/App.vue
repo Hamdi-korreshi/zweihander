@@ -1,24 +1,25 @@
-<script setup>
-</script>
-
 <template>
   <div>
-    <p>Bruh its working</p>
-    <button class="btn">Bruh</button>
+    <!-- <Intro360
+      v-model:open="showIntro"
+      logo-text="HAMDI KORRESHI"
+      @finished="onIntroDone"
+    />
+    <!-- remove router-view unless you’ve installed and wired vue-router -->
+    <NavBar :item="tabs"></NavBar>
+    <router-view/>
   </div>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<script setup>
+import { ref } from 'vue'
+
+// IMPORTANT: use a RELATIVE path that matches your actual filename.
+// If your file is src/components/IntroAnimation.vue:
+import Intro360 from './components/IntroAnimation.vue'
+import Home from "./components/Home.vue"
+import NavBar from './components/NavBar.vue'
+
+const showIntro = ref(true)
+const onIntroDone = () => console.log('intro finished')
+</script>
