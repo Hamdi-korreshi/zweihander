@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../components/Home.vue";
-import Projects from "../components/Projects.vue";
+import Projects from "../components/Projects/Projects.vue";
 import Articles from "../components/Articles.vue";
+import ProjectDetail from "../components/Projects/ProjectDetail.vue";
 
 const routes = [
     {
@@ -17,6 +18,11 @@ const routes = [
         component: Projects,
         meta: {showInTabs: true, label: 'Projects'},
 
+    },
+    {
+        path: "/projects/:slug.md",
+        name: "ProjectDetail",
+        component: ProjectDetail
     },
     {
         path: "/articles",
