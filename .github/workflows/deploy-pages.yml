@@ -37,7 +37,7 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
 
       - name: Load CNAME
-        run: echo "hamdikorreshi.me" >> src/dist/CNAME
+        run: echo "hamdikorreshi.me" >> CNAME
 
       - name: Load SSH key (deploy key for publish repo)
         uses: webfactory/ssh-agent@v0.9.0
