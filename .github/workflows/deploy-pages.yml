@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checout@v4
+        uses: actions/checkout@v4
 
       - name: Use Node 20
         uses: action/setup-node@v4
