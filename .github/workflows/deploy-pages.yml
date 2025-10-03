@@ -36,6 +36,9 @@ jobs:
            EOF'
           chmod 644 ~/.ssh/known_hosts
 
+      - name: Load CNAME
+        run: echo "hamdikorreshi.me" >> src/dist/CNAME
+
       - name: Load SSH key (deploy key for publish repo)
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -43,6 +46,7 @@ jobs:
             ${{ secrets.PUBLISH_KEY }}
           ssh-passphrase: |
             ${{ secrets.PUBLISH_KEY_PASSPHRASE }}
+
       - name: Push bulid to publish repo
         env:
           PUBLISH_REPO: git@github.com:Hamdi-korreshi/Hamdi-korreshi.github.io.git
