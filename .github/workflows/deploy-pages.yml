@@ -36,7 +36,7 @@ jobs:
         run: cp dist/index.html dist/404.html || true
 
       - name: Load CNAME
-        run: echo "hamdikorreshi.me" >> CNAME
+        run: echo "hamdikorreshi.me" >> dist/CNAME
 
       - name: Trust GitHub host key (pinned)
         run: |
