@@ -24,6 +24,14 @@ jobs:
       - name: Build Vue App
         run: npm run build
 
+      - name: Inspect build output
+        run: |
+          echo "PWD=$(pwd)"
+          echo "Tree of repo root:"
+          ls -lah
+          echo "Tree of dist (or outDir):"
+          find dist -maxdepth 2 -type f -print 2>/dev/null || true
+
       - name: Add 404.html for SPA routing
         run: cp dist/index.html dist/404.html || true
 
