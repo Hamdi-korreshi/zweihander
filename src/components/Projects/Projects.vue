@@ -8,11 +8,6 @@
                 :project="p"
             />
         </div>
-        <div>
-            <TestDoc>
-                
-            </TestDoc>
-        </div>
     </div>
 </template>
 

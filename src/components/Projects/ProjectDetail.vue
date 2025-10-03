@@ -1,6 +1,10 @@
 <template>
   <div class="max-w-3xl mx-auto p-6">
-    <component v-if="Comp" :is="Comp" class="prose max-w-none" />
+    <component 
+        v-if="Comp" 
+        :is="Comp" 
+        class="md-prose" 
+    />
     <div v-else class="text-gray-500">
       Not found for slug: <code>{{ slug }}</code>
       <div class="mt-2 text-xs">Known: {{ known.join(', ') }}</div>
