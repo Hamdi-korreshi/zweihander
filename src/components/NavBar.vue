@@ -29,12 +29,5 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import router from '../routes/routes';
-const items = router.options.routes.filter(r => r.meta?.showInTabs);
-
-defineProps({
-    items: {
-        type: Array,
-        required: true,
-    },
-})
+const items = router.getRoutes().filter(r => r.meta?.showInTabs);
 </script>

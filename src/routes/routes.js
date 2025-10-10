@@ -3,6 +3,7 @@ import Home from "../components/Home.vue";
 import Projects from "../components/Projects/Projects.vue";
 import Articles from "../components/Articles.vue";
 import ProjectDetail from "../components/Projects/ProjectDetail.vue";
+import IntroView from "../components/IntroView.vue";
 
 const routes = [
     {
@@ -29,6 +30,11 @@ const routes = [
         name: "Articles",
         component: Articles,
         meta: {showInTabs: true, label: 'Articles'},
+    },
+    {
+        path: '/intro',
+        name: 'Intro',
+        component: IntroView,
     }
 ]
 

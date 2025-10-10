@@ -26,6 +26,11 @@ export default {
     tailwindcss(),
     vue({
       include: [/\.vue$/, /\.md$/],
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith('ion-'),
+        },
+      }
     }),
     Markdown({ })
   ],

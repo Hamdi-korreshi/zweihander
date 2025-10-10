@@ -21,7 +21,7 @@
         </div>
         <div class="col-span-1 rounded-xl p-6 text-3xl sm:text-4xl md:text-6xl lg:text-8xl">
             <a href="https://www.linkedin.com/in/hamdi-korreshi/">
-                <ion-icon name="logo-linkedin"></ion-icon>
+                <ion-icon name="logo-linkedin" style="color: #0A66c2;"></ion-icon>
             </a>
         </div>
         <div class="col-span-1 rounded-xl p-6 text-3xl sm:text-4xl md:text-6xl lg:text-8xl">
@@ -35,4 +35,5 @@
 </template>
 
 <script setup>
+
 </script>
