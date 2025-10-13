@@ -4,7 +4,6 @@ date: 2025-05-20
 tech: [Vue, Django, PostgreSQL, Docker, Tailwind]
 links:
   github: https://github.com/you/btc-village
-  demo: https://btc-village.example.com
 summary: A platform for coordinated support networks with roles, calendar, and notifications.
 ---
 
