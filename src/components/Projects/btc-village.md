@@ -8,7 +8,7 @@ summary: A platform for coordinated support networks with roles, calendar, and n
 ---
 
 ## Overview
-This was my capstone project that I worked with 4 other people for B The Cause (the current startup I am working for as a Project Manager). The tech stack was half decided by the CEO and the other half was decided by me. 
+This was my capstone project that I worked with 4 other people for B The Cause (the current startup I am working for as a Project Manager). The tech stack was half decided by the CEO and the other half was decided by me. GitHub has been private but I will post the link for the MVP once they go public.
 
 ## Architecture
 - Frontend: Vue + Pinia + Tailwind

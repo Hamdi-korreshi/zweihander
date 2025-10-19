@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import Markdown from 'unplugin-vue-markdown/vite'
+import { fileURLToPath, URL } from 'node:url'
+
 
 // https://vite.dev/config/
 export default {
@@ -22,6 +24,9 @@ export default {
       })
     }
   },
+  resolve: {
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) }
+  },
   plugins: [
     tailwindcss(),
     vue({
@@ -32,6 +37,9 @@ export default {
         },
       }
     }),
-    Markdown({ })
+    Markdown({ 
+      html: true,
+      linkify: true
+    })
   ],
 }
