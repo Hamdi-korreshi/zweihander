@@ -1,9 +1,9 @@
 ---
 title: COOL Compiler
-date: 2025-05-20
+date: 2024-12-20
 tech: [Ocaml, Bash]
 links:
-  github: https://github.com/you/btc-village
+  github: https://github.com/Hamdi-korreshi/CS488_compilers
 summary: A Java-like compiler with functional programming
 ---
 
