@@ -1,12 +1,19 @@
 <template>
     <article class="rounded-2xl border p-4 hover:shadow-lg transition bg-white/70">
-        <img 
-            v-if="project.image"
-            :src="project.image"
-            :alt="project.title"
-            class="rounded-xl w-full aspect-video object-cover"
-            loading="lazy"
-            />
+        <div>
+            <RouterLink
+                    :to="{ name: 'ProjectDetail', params: {slug: project.slug}}"
+            >
+            <img 
+                v-if="project.image"
+                :src="project.image"
+                :alt="project.title"
+                class="rounded-xl w-full aspect-video object-cover"
+                loading="lazy"
+                
+                />
+            </RouterLink>
+        </div>
         <h3 class="text-lg font-semibold mt-3">{{ project.title }}</h3>
         <p class="text-gray-600 mt-1 line-clamp-3">{{ project.excerpt }}</p>
         <div class="flex flex-wrap gap-2 mt-3">
