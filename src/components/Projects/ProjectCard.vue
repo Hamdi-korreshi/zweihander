@@ -10,7 +10,6 @@
                 :alt="project.title"
                 class="rounded-xl w-full aspect-video object-cover"
                 loading="lazy"
-                
                 />
             </RouterLink>
         </div>

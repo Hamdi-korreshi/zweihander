@@ -6,7 +6,6 @@ const router = useRouter();
 function onCovered() {
     router.replace({ name: 'Home'})
 }
-console.log(router.name, router.path)
 </script>
 
 <template>

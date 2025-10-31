@@ -104,15 +104,17 @@ onMounted(async () => {
   await nextTick()
   pageRef.value = stageRef.value?.querySelector('#page') ?? null
 
+  const onAnimStart = (e) => {
+    if (e.animationName === 'page-cover') {
+      document.body.classList.add('fade-out')
+    }
+  }
   animEndHandler = (e) => {
     if (e.animationName !== 'page-cover') return
     emit('covered')
     if (props.next) {
-      document.body.classList.add('fade-out')
-      setTimeout(() => {
-        window.location.href = props.next
-        emit('navigated')
-      }, 360)
+      window.location.href = props.next
+      emit('navigated')
     }
   }
   pageRef.value?.addEventListener('animationend', animEndHandler)
@@ -122,6 +124,8 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   pageRef.value?.removeEventListener('animationend', animEndHandler)
+  pageRef.value?.removeEventListener('animationstart', onAnimStart)
+
 })
 
 watch(() => props.autoPlay ?? false, (v) => (v ? play() : stop()))
@@ -129,15 +133,15 @@ watch(() => props.autoPlay ?? false, (v) => (v ? play() : stop()))
 
 <style>
 :root{
-  --t1: 900ms;
-  --t2: 800ms;
-  --t3: 1400ms;
-  --t4: 900ms;
+  --t1: 450ms;  /* slide in */
+  --t2: 420ms;  /* drawer open */
+  --t3: 780ms;  /* page-fly */
+  --t4: 540ms;
   --gap: 2.5vmin;
 }
 
 .stage.animate-cabinet #cabinet { animation: slide-in var(--t1) ease-out both; }
-.stage.animate-cabinet #drawer  { animation: drawer-open var(--t2) var(--t1) ease-in-out both; }
+.stage.animate-cabinet #drawer  { animation: drawer-open var(--t2) var(--t1); }
 .stage.animate-cabinet #page {
   animation:
     page-fly var(--t3) calc(var(--t1) + var(--t2)) cubic-bezier(.2,.7,.2,1) both,
@@ -148,7 +152,7 @@ watch(() => props.autoPlay ?? false, (v) => (v ? play() : stop()))
 @keyframes slide-in { from { transform: translateX(-70vw) rotate(-1deg); } to { transform: translateX(0) rotate(0deg); } }
 
 @keyframes drawer-open {
-  0%   { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  /* 0%   { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); } */
   100% { transform: translateY(-14%) scale(1.02); filter: drop-shadow(0 .9vmin 1.2vmin rgba(0,0,0,.35)); }
 }
 
@@ -168,7 +172,7 @@ watch(() => props.autoPlay ?? false, (v) => (v ? play() : stop()))
 @keyframes page-wobble { 0% { transform: rotate(-12deg); } 35% { transform: rotate(-7deg); } 70% { transform: rotate(-10deg); } 100% { transform: rotate(-8.5deg); } }
 
 @keyframes fade-out { from { opacity: 1 } to { opacity: 0 } }
-body.fade-out { animation: fade-out 360ms ease-in forwards; }
+body.fade-out { animation: fade-out var(--t4) ease-in forwards; }
 
 @media (prefers-reduced-motion: reduce) {
   .stage.animate-cabinet * { animation: none !important; transition: none !important; }
