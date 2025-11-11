@@ -23,7 +23,7 @@
         </linearGradient>
       </defs>
 
-      <g id="body">
+      <g id="body" class="tilt-animation">
         <rect x="20" y="20" width="260" height="480" rx="14" ry="14" fill="url(#bodyGrad)" stroke="#b8c2d1" stroke-width="3"/>
         <ellipse cx="150" cy="508" rx="90" ry="10" fill="rgba(0,0,0,.25)"/>
       </g>
@@ -132,6 +132,28 @@ watch(() => props.autoPlay ?? false, (v) => (v ? play() : stop()))
 </script>
 
 <style>
+
+.cabinet {
+  transform-box: fill-box; /* ensures transform-origin uses the SVG element’s box */
+  transform-origin: bottom left;
+  animation: pivotSwitch 3s ease-in-out infinite alternate;
+}
+
+@keyframes pivotSwitch {
+  0% {
+    transform-origin: bottom left;
+    transform: rotate(-20deg);
+  }
+  50% {
+    transform-origin: bottom center;
+    transform: rotate(0deg);
+  }
+  100% {
+    transform-origin: bottom right;
+    transform: rotate(20deg);
+  }
+}
+
 :root{
   --t1: 450ms;  /* slide in */
   --t2: 420ms;  /* drawer open */
