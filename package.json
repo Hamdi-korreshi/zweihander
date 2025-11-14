@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "gsap": "^3.13.0",
     "three": "^0.180.0",
     "unplugin-vue-markdown": "^29.2.0",
     "vue": "^3.5.21",

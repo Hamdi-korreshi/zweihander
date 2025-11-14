@@ -1,204 +1,179 @@
 <template>
-  <div
-    ref="stageRef"
-    class="stage grid place-items-center min-h-svh overflow-hidden bg-[radial-gradient(120%_90%_at_50%_40%,#10121a_0%,#0a0c12_45%,#000_100%)]"
-    :data-next="next || ''"
-    @click="clickReplay ? replay() : null"
-  >
-    <svg
-      id="cabinet"
-      viewBox="0 0 300 520"
-      role="img"
-      aria-labelledby="title desc"
-      class="drop-shadow-[0_1.6vmin_2.6vmin_rgba(0,0,0,0.35)]"
-      style="width: clamp(220px, 40vmin, 540px); height: auto; overflow: visible; transform-box: fill-box; transform-origin: center;"
-    >
-      <title id="title">Filing cabinet animation</title>
-      <desc id="desc">Cabinet slides to center, top drawer opens, and a page flies out to cover the screen.</desc>
+  <div ref="stage" class="stage">
+    <!-- Full‑screen track that we slide across the viewport -->
+    <div id="track" class="frame">
+      <!-- New: a tight wrapper around the cabinet so rotation origin is on the cabinet base, not the full screen -->
+      <div id="rig" class="rig">
+        <!-- Minimal SVG filing cabinet -->
+        <svg ref="cabinetSvg" id="cabinet" viewBox="0 0 300 520" class="cabinet" role="img" style="overflow: visible">
+          <g id="cabinetWrap">
+            <rect x="20" y="20" width="260" height="480" rx="14" ry="14" fill="#e8edf6" stroke="#bfc7d6"
+              stroke-width="3" />
 
-      <defs>
-        <linearGradient id="bodyGrad" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#eef2f8"/>
-          <stop offset="100%" stop-color="#d5dce8"/>
-        </linearGradient>
-      </defs>
+            <!-- top drawer (opens) -->
+            <g id="drawerTop">
+              <rect x="40" y="50" width="220" height="110" rx="8" ry="8" fill="#f0f3f9" stroke="#c5ccda" />
+              <rect x="120" y="98" width="60" height="24" rx="6" ry="6" fill="#9fb0c6" />
+            </g>
 
-      <g id="body" class="tilt-animation">
-        <rect x="20" y="20" width="260" height="480" rx="14" ry="14" fill="url(#bodyGrad)" stroke="#b8c2d1" stroke-width="3"/>
-        <ellipse cx="150" cy="508" rx="90" ry="10" fill="rgba(0,0,0,.25)"/>
-      </g>
+            <!-- middle drawer -->
+            <g id="drawerMid">
+              <rect x="40" y="200" width="220" height="110" rx="8" ry="8" fill="#f0f3f9" stroke="#c5ccda" />
+              <rect x="120" y="248" width="60" height="24" rx="6" ry="6" fill="#9fb0c6" />
+            </g>
 
-      <!-- top drawer -->
-      <g id="drawer" style="transform-box: fill-box; transform-origin: 50% 100%;">
-        <rect x="40" y="40" width="220" height="130" rx="8" ry="8" fill="#e9eef7" stroke="#b8c2d1" stroke-width="2"/>
-        <rect x="130" y="85" width="40" height="20" rx="6" fill="#8fa0b8"/>
-
-        <!-- page inside drawer -->
-        <g id="page" style="opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; will-change: transform, filter;">
-          <g id="page-inner">
-            <rect x="70" y="40" width="160" height="200" rx="8" fill="#ffffff" stroke="#e7eaf0" stroke-width="1.5"/>
-            <path d="M220,40 L210,60 L220,60 Z" fill="#f3f6fb"/>
-            <g stroke="#cfd8e6" stroke-width="2" opacity="0.8">
-              <line x1="85" y1="80" x2="210" y2="80"/>
-              <line x1="85" y1="98" x2="198" y2="98"/>
-              <line x1="85" y1="116" x2="205" y2="116"/>
-              <line x1="85" y1="150" x2="195" y2="150"/>
-              <line x1="85" y1="168" x2="205" y2="168"/>
+            <!-- bottom drawer -->
+            <g id="drawerBot">
+              <rect x="40" y="350" width="220" height="110" rx="8" ry="8" fill="#f0f3f9" stroke="#c5ccda" />
+              <rect x="120" y="398" width="60" height="24" rx="6" ry="6" fill="#9fb0c6" />
             </g>
           </g>
-        </g>
-      </g>
+        </svg>
 
-      <!-- lower drawers -->
-      <g id="drawer2">
-        <rect x="40" y="190" width="220" height="130" rx="8" ry="8" fill="#e9eef7" stroke="#b8c2d1" stroke-width="2"/>
-        <rect x="130" y="215" width="40" height="20" rx="6" fill="#8fa0b8"/>
-      </g>
-      <g id="drawer3">
-        <rect x="40" y="340" width="220" height="130" rx="8" ry="8" fill="#e9eef7" stroke="#b8c2d1" stroke-width="2"/>
-        <rect x="130" y="345" width="40" height="20" rx="6" fill="#8fa0b8"/>
-      </g>
-    </svg>
+        <!-- Paper (HTML element for reliable 3D pop) -->
+        <div ref="paper" class="paper" aria-hidden="true">
+          <div class="sheet"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import { onMounted, ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { ref, onMounted, onBeforeUnmount, nextTick, watch, defineProps, defineEmits } from 'vue'
-const router = useRouter();
-const props = defineProps({
-  autoPlay: { type: Boolean, default: true },
-  next: { type: String, default: '' },
-  clickReplay: { type: Boolean, default: true }
-})
-const emit = defineEmits(['covered', 'navigated'])
+import gsap from 'gsap'
 
-const stageRef = ref(null)
-const pageRef = ref(null)
-let animEndHandler = null
+const stage = ref(null)
+const paper = ref(null)
+const router = useRouter()
 
-function onCovered() { router.replace({ name: 'home'})}
-function play () {
-  const el = stageRef.value
-  if (!el) return
-  el.classList.add('animate-cabinet')
+function lean(side, angle=12) {
+  const origin = side === 'right' ? '100% 100%' : '0% 100%'
+  const target = side === 'right' ? angle: -angle
+
+  return gsap.timeline()
+    .set('#rig', {rotation: 0, transformOrigin: origin})
+    .to('#rig', {rotation: target, duration:0.45, ease: 'power2.in'})
+    .to('#rig', {rotation: 0, duration: 0.20, ease: 'power2.out'})
 }
-
-function stop () {
-  const el = stageRef.value
-  if (!el) return
-  el.classList.remove('animate-cabinet')
-}
-
-function replay () {
-  const el = stageRef.value
-  if (!el) return
-  el.classList.remove('animate-cabinet')
-  void el.offsetWidth
-  el.classList.add('animate-cabinet')
-}
-
-defineExpose({ play, stop, replay })
-
 onMounted(async () => {
   await nextTick()
-  pageRef.value = stageRef.value?.querySelector('#page') ?? null
 
-  const onAnimStart = (e) => {
-    if (e.animationName === 'page-cover') {
-      document.body.classList.add('fade-out')
-    }
-  }
-  animEndHandler = (e) => {
-    if (e.animationName !== 'page-cover') return
-    emit('covered')
-    if (props.next) {
-      window.location.href = props.next
-      emit('navigated')
-    }
-  }
-  pageRef.value?.addEventListener('animationend', animEndHandler)
+  // Start frame fully off-screen LEFT and prep elements
+  gsap.set('#track', { xPercent: -110 })
+  gsap.set('#rig', { rotation: 0, transformOrigin: '100% 100%' })
+  gsap.set('#cabinetWrap', { rotation: 0, transformOrigin: '50% 100%' })
+  gsap.set('#drawerTop', { y: 0, transformOrigin: '50% 0%' })
+  gsap.set(paper.value, { autoAlpha: 0, scale: 0.25, y: -140 })
 
-  if (props.autoPlay ?? false) play()
+  const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+
+  tl
+    // Slide the whole frame from off-screen LEFT to centered (xPercent 0)
+    .to('#track', { xPercent: 0, duration: 0.7, ease: 'power3.out' }, 'slide')
+    // Lean right as if pushed on the left side; rotate only the tight rig around its bottom-right corner
+    // .to('#rig', {
+    //   keyframes: [
+    //     { rotation: 14, duration: 0.45, ease: 'power2.in' },
+    //     { rotation: -2, duration: 0.20, ease: 'power2.out' },
+    //     { rotation: 0, duration: 0.14, ease: 'power2.out' }
+    //   ]
+    // })
+    .add(lean('right', 12), 'slide+=0.3')
+    .add(lean('left',10), '+=0.04', 'slide+=0.01')
+    // Open the top drawer
+    .to('#drawerTop', { z: -60, duration: 0.45 }, 'drawer')
+    // Paper flies forward
+    .set(paper.value, { autoAlpha: 1 }, 'drawer+=0.25')
+    .to(paper.value, { y: -220, scale: 3.2, duration: 0.7, ease: 'power3.out' })
+    // .add(() => {
+    //   const cur = router.currentRoute.value
+    //   const atHome = cur && (cur.name === 'Home' || cur.path === '/')
+    //   router.replace(atHome ? { name: 'Projects' } : { name: 'Home' })
+    // })
 })
-
-onBeforeUnmount(() => {
-  pageRef.value?.removeEventListener('animationend', animEndHandler)
-  pageRef.value?.removeEventListener('animationstart', onAnimStart)
-
-})
-
-watch(() => props.autoPlay ?? false, (v) => (v ? play() : stop()))
 </script>
 
-<style>
+<style scoped>
+/* Make the stage truly full-screen so the slide traverses the whole viewport */
+.stage {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 90% at 50% 40%, #10121a 0%, #0a0c12 45%, #000 100%);
+  overflow: hidden;
+  z-index: 999;
+  /* sits above page during intro */
+}
+
+/* The track that moves across the entire screen */
+.frame {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  /* frame clips to viewport */
+}
+
+/* New tight wrapper so rotation origin matches the cabinet's base corner */
+.rig {
+  display: grid;
+  place-items: center;
+  align-self: end;
+  /* sit on the "floor" */
+  justify-self: center;
+  /* centered horizontally */
+  will-change: transform;
+  overflow: visible;
+}
 
 .cabinet {
-  transform-box: fill-box; /* ensures transform-origin uses the SVG element’s box */
-  transform-origin: bottom left;
-  animation: pivotSwitch 3s ease-in-out infinite alternate;
+  width: min(62vmin, 520px);
+  height: auto;
+  overflow: visible;
 }
 
-@keyframes pivotSwitch {
-  0% {
-    transform-origin: bottom left;
-    transform: rotate(-20deg);
-  }
-  50% {
-    transform-origin: bottom center;
-    transform: rotate(0deg);
-  }
-  100% {
-    transform-origin: bottom right;
-    transform: rotate(20deg);
-  }
+.cabinet {
+  width: min(62vmin, 520px);
+  height: auto;
+  overflow: visible;
 }
 
-:root{
-  --t1: 450ms;  /* slide in */
-  --t2: 420ms;  /* drawer open */
-  --t3: 780ms;  /* page-fly */
-  --t4: 540ms;
-  --gap: 2.5vmin;
+/* Correct SVG pivoting */
+#cabinetWrap,
+#drawerTop,
+#drawerMid,
+#drawerBot {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
 }
 
-.stage.animate-cabinet #cabinet { animation: slide-in var(--t1) ease-out both; }
-.stage.animate-cabinet #drawer  { animation: drawer-open var(--t2) var(--t1); }
-.stage.animate-cabinet #page {
-  animation:
-    page-fly var(--t3) calc(var(--t1) + var(--t2)) cubic-bezier(.2,.7,.2,1) both,
-    page-cover var(--t4) calc(var(--t1) + var(--t2) + var(--t3)) ease-in both;
-}
-.stage.animate-cabinet #page-inner { animation: page-wobble 1800ms calc(var(--t1) + var(--t2) + var(--t3) - 800ms) ease-in-out both; transform-origin: 50% 2%; }
-
-@keyframes slide-in { from { transform: translateX(-70vw) rotate(-1deg); } to { transform: translateX(0) rotate(0deg); } }
-
-@keyframes drawer-open {
-  /* 0%   { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); } */
-  100% { transform: translateY(-14%) scale(1.02); filter: drop-shadow(0 .9vmin 1.2vmin rgba(0,0,0,.35)); }
+/* Paper */
+.paper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
-@keyframes page-fly {
-  0%   { opacity: 0; transform: translate(0, 0) scale(.45) rotateX(8deg) rotate(-1deg); filter: blur(2px) drop-shadow(0 .2vmin .4vmin rgba(0,0,0,.25)); }
-  10%  { opacity: 1; }
-  55%  { transform: translate(calc(var(--gap) * .35), calc(-30vmin)) scale(1.6) rotateX(4deg) rotate(-6deg); filter: blur(1px) drop-shadow(0 1vmin 1.6vmin rgba(0,0,0,.28)); }
-  100% { transform: translate(0, calc(-18vmin)) scale(2.7) rotateX(0deg) rotate(-10deg); filter: blur(0px) drop-shadow(0 2.2vmin 3.2vmin rgba(0,0,0,.32)); }
-}
-
-@keyframes page-cover {
-  0%   { transform: translate(0, calc(-18vmin)) scale(2.7) rotateX(0deg) rotate(-10deg); }
-  80%  { transform: translate(0, calc(-10vmin)) scale(6.5) rotateX(0deg) rotate(-4deg); }
-  100% { transform: translate(0, 0) scale(10) rotateX(0deg) rotate(0deg); }
-}
-
-@keyframes page-wobble { 0% { transform: rotate(-12deg); } 35% { transform: rotate(-7deg); } 70% { transform: rotate(-10deg); } 100% { transform: rotate(-8.5deg); } }
-
-@keyframes fade-out { from { opacity: 1 } to { opacity: 0 } }
-body.fade-out { animation: fade-out var(--t4) ease-in forwards; }
-
-@media (prefers-reduced-motion: reduce) {
-  .stage.animate-cabinet * { animation: none !important; transition: none !important; }
-  #drawer { transform: translateY(-10%) !important; }
-  #page { opacity: 1 !important; transform: translate(0, -30vmin) scale(1.6) !important; }
+.sheet {
+  width: 120px;
+  height: 160px;
+  background: #fff;
+  border: 2px solid #d1d8ea;
+  border-radius: 6px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
 }
 </style>
+
+<!--
+Changes for full-screen slide:
+- Stage is fixed to the viewport (100vw x 100vh) and sits on top during the intro.
+- Added a #cabinetFrame that spans the full viewport; we animate its xPercent from -110 to 0 so the slide always starts fully off-screen and travels across the entire screen width, independent of the SVG's own size.
+-->

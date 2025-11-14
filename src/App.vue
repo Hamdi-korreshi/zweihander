@@ -8,9 +8,6 @@
 
 <script setup>
 import { ref } from 'vue'
-
-// IMPORTANT: use a RELATIVE path that matches your actual filename.
-// If your file is src/components/IntroAnimation.vue:
 import NavBar from './components/NavBar.vue'
 import { useRoute } from 'vue-router'
 const route = useRoute();
